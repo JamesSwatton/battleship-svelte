@@ -35,6 +35,16 @@
         updateShipPos();
     }
 
+    function handleClick(id) {
+        if (state === "placement" && selected) {
+            saveShipPos();
+        } else if (state === "placement" && !selected) {
+            ships.forEach((s) => {
+                if (s.pos.includes(id)) selected = s;
+            });
+        }
+    }
+
     function updateShipPos() {
         if (selected && currentPos) {
             let parsedCurrentPos = currentPos.split("").map((c) => parseInt(c));
@@ -84,11 +94,11 @@
         border: 1px solid black;
     }
 
-    .grid-square:hover {
-        background-color: lightgray;
+    .ship {
+        background-color: lightblue;
     }
 
-    .ship {
+    .selectedShip {
         background-color: cyan;
     }
 
@@ -97,14 +107,19 @@
     }
 </style>
 
-<div id="grid-container" on:mouseleave={() => (currentPos = null)}>
+<div
+    id="grid-container"
+    on:mouseleave={() => {
+        if (selected) selected.pos = [];
+    }}>
     {#each ids as id}
         <div
             {id}
             class="grid-square"
             on:mouseenter={() => handleMouseEnter(id)}
-            on:click={() => state === 'placement' && selected && saveShipPos()}
-            class:ship={allPos.includes(id) || (selected && selected.pos.includes(id))}
+            on:click={() => handleClick(id)}
+            class:ship={allPos.includes(id)}
+            class:selectedShip={selected && selected.pos.includes(id)}
             class:overlap={allPos.includes(id) && selected && selected.pos.includes(id)}>
             {id}
         </div>
