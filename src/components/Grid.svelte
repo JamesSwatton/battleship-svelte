@@ -28,11 +28,16 @@
             let x = parsedCurrentPos[0];
             let y = parsedCurrentPos[1];
             let pos = [];
+            const constrain = (pos, size) =>
+                pos > 10 - size ? 10 - size : pos;
             if (orientation === "horizontal") {
+                x = constrain(parsedCurrentPos[0], selected.size);
+                console.log(x);
                 for (let i = x; i < x + selected.size; i++) {
                     pos.push(`${i}${y}`);
                 }
             } else {
+                y = constrain(parsedCurrentPos[1], selected.size);
                 for (let j = y; j < y + selected.size; j++) {
                     pos.push(`${x}${j}`);
                 }
