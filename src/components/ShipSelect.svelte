@@ -1,15 +1,6 @@
 <script>
-    import { createEventDispatcher } from "svelte";
-    const dispatch = createEventDispatcher();
-
     export let ships;
-
-    let selected = null;
-
-    function handleSelect(event) {
-        selected = event;
-        dispatch("selected", selected);
-    }
+    export let selected;
 </script>
 
 <style>
@@ -22,8 +13,8 @@
     {#each ships as ship}
         <li>
             <button
-                on:click={() => handleSelect(ship)}
-                class:selected={selected === ship}
+                on:click={() => (selected = ship)}
+                class:selected={selected && selected.type === ship.type}
                 value={ship.type}>{ship.type}</button>
         </li>
     {/each}

@@ -1,10 +1,24 @@
 <script>
     import { onMount } from "svelte";
 
+    export let state;
+    export let ships;
     export let selected;
     export let orientation;
 
     let currentPos = null;
+
+    let allPos = [];
+
+    $: {
+        if (selected) {
+            allPos = ships
+                .map((s) => (s.type !== selected.type ? s.pos : []))
+                .flat();
+        } else {
+            allPos = ships.map((s) => s.pos).flat();
+        }
+    }
 
     let ids = [];
 
@@ -14,7 +28,6 @@
                 ids = [...ids, `${x}${y}`];
             }
         }
-        console.log(ids);
     }
 
     function handleMouseEnter(id) {
@@ -32,7 +45,6 @@
                 pos > 10 - size ? 10 - size : pos;
             if (orientation === "horizontal") {
                 x = constrain(parsedCurrentPos[0], selected.size);
-                console.log(x);
                 for (let i = x; i < x + selected.size; i++) {
                     pos.push(`${i}${y}`);
                 }
@@ -43,6 +55,16 @@
                 }
             }
             selected = { ...selected, pos: pos };
+        }
+    }
+
+    function saveShipPos() {
+        const hasNoOverlap = () =>
+            selected.pos.every((e) => !allPos.includes(e));
+        if (hasNoOverlap()) {
+            let index = ships.findIndex((e) => e.type === selected.type);
+            ships[index] = selected;
+            selected = null;
         }
     }
 
@@ -69,6 +91,10 @@
     .ship {
         background-color: cyan;
     }
+
+    .overlap {
+        background-color: red;
+    }
 </style>
 
 <div id="grid-container" on:mouseleave={() => (currentPos = null)}>
@@ -77,7 +103,9 @@
             {id}
             class="grid-square"
             on:mouseenter={() => handleMouseEnter(id)}
-            class:ship={selected && selected.pos.includes(id)}>
+            on:click={() => state === 'placement' && selected && saveShipPos()}
+            class:ship={allPos.includes(id) || (selected && selected.pos.includes(id))}
+            class:overlap={allPos.includes(id) && selected && selected.pos.includes(id)}>
             {id}
         </div>
     {/each}
