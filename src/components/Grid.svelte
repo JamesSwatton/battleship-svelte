@@ -1,6 +1,10 @@
 <script>
     import { onMount } from "svelte";
+
     export let selected;
+    export let orientation;
+
+    let currentPos = null;
 
     let ids = [];
 
@@ -11,6 +15,30 @@
             }
         }
         console.log(ids);
+    }
+
+    function handleMouseEnter(id) {
+        currentPos = id;
+        updateShipPos();
+    }
+
+    function updateShipPos() {
+        if (selected && currentPos) {
+            let parsedCurrentPos = currentPos.split("").map((c) => parseInt(c));
+            let x = parsedCurrentPos[0];
+            let y = parsedCurrentPos[1];
+            let pos = [];
+            if (orientation === "horizontal") {
+                for (let i = x; i < x + selected.size; i++) {
+                    pos.push(`${i}${y}`);
+                }
+            } else {
+                for (let j = y; j < y + selected.size; j++) {
+                    pos.push(`${x}${j}`);
+                }
+            }
+            selected = { ...selected, pos: pos };
+        }
     }
 
     onMount(() => createIDs());
@@ -32,10 +60,20 @@
     .grid-square:hover {
         background-color: lightgray;
     }
+
+    .ship {
+        background-color: cyan;
+    }
 </style>
 
-<div id="grid-container">
+<div id="grid-container" on:mouseleave={() => (currentPos = null)}>
     {#each ids as id}
-        <div {id} class="grid-square">{id}</div>
+        <div
+            {id}
+            class="grid-square"
+            on:mouseenter={() => handleMouseEnter(id)}
+            class:ship={selected && selected.pos.includes(id)}>
+            {id}
+        </div>
     {/each}
 </div>

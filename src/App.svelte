@@ -13,12 +13,13 @@
     ];
 
     let selected = null;
+    let orientation = "horizontal";
 
     $: {
         if (selected) console.log(selected.type);
     }
 </script>
 
-<Grid {selected} />
-<OrientationBtn />
+<Grid {selected} {orientation} />
+<OrientationBtn on:orientation={(e) => (orientation = e.detail)} />
 <ShipSelect {ships} on:selected={(e) => (selected = e.detail)} />

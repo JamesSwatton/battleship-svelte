@@ -1,12 +1,16 @@
 <script>
+    import { createEventDispatcher } from "svelte";
+    let dispatch = createEventDispatcher();
+
     let orientation = "horizontal";
 
-    function changeOrientation() {
+    function handleChangeOrientation() {
         orientation = orientation === "horizontal" ? "vertical" : "horizontal";
+        dispatch("orientation", orientation);
     }
 
     $: console.log(orientation);
 </script>
 
-<button on:click={() => changeOrientation()}>Change Orientation</button>
+<button on:click={() => handleChangeOrientation()}>Change Orientation</button>
 <p>{orientation}</p>
