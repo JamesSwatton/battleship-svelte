@@ -1,4 +1,5 @@
 <script>
+    import PlacementOption from "./components/PlacementOptions.svelte";
     import ShipSelect from "./components/ShipSelect.svelte";
     import Grid from "./components/Grid.svelte";
     import OrientationBtn from "./components/OrientationBtn.svelte";
@@ -19,11 +20,31 @@
     let selected = null;
     let orientation = "horizontal";
 
-    $: {
-        if (selected) console.log(selected.type);
+    function clearShips() {
+        ships = ships.map(s => {
+            return {...s, pos: []}
+        })
+        console.log(ships)
     }
 </script>
 
-<Grid bind:selected {orientation} bind:ships {state} />
-<OrientationBtn on:orientation={(e) => (orientation = e.detail)} />
-<ShipSelect {ships} bind:selected on:selected={(e) => (selected = e.detail)} />
+<style>
+    #game-container {
+        display: inline-flex;
+    }
+
+    #ship-placement {
+        display: inline-block;
+    }
+</style>
+
+<div id="game-container">
+    <Grid bind:selected {orientation} bind:ships {state} />
+    <div id="ship-placement">
+        <ShipSelect bind:ships bind:selected on:selected={(e) => (selected = e.detail)} />
+        <hr>
+        <OrientationBtn on:orientation={(e) => (orientation = e.detail)} />
+        <hr>
+        <PlacementOption on:clear={() => clearShips() }></PlacementOption>
+    </div>
+</div>

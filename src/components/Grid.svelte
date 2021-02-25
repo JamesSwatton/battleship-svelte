@@ -95,6 +95,7 @@
     }
 
     .ship {
+        cursor: pointer;
         background-color: lightblue;
     }
 
