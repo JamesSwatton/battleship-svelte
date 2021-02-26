@@ -1,9 +1,9 @@
 <script>
     export let ships;
-    export let selected;
+    export let selectedShip;
 
     function handleClick(ship) {
-        selected = ship;
+        selectedShip = ship;
         ships[ships.findIndex(s => s.type === ship.type)].pos = [];
     }
 </script>
@@ -17,7 +17,7 @@
         cursor: pointer;
     }
 
-    .selected {
+    .selectedShip {
         border-bottom: 2px solid black;
     }
 
@@ -33,7 +33,7 @@
         <li>
             <button
                 on:click={() => handleClick(ship)}
-                class:selected={selected && selected.type === ship.type}
+                class:selectedShip={selectedShip && selectedShip.type === ship.type}
                 class:placed={ship.pos.length > 0}
                 value={ship.type}>{ship.type}</button>
         </li>

@@ -17,14 +17,14 @@
         { type: "destroyer",  size: 2, hits: [], pos: [] },
     ];
 
-    let selected = null;
+    let selectedShip = null;
     let orientation = "horizontal";
+    let grid;
 
     function clearShips() {
         ships = ships.map(s => {
             return {...s, pos: []}
         })
-        console.log(ships)
     }
 </script>
 
@@ -39,12 +39,13 @@
 </style>
 
 <div id="game-container">
-    <Grid bind:selected {orientation} bind:ships {state} />
+    <Grid bind:this={grid} bind:selectedShip {orientation} bind:ships {state} />
     <div id="ship-placement">
-        <ShipSelect bind:ships bind:selected on:selected={(e) => (selected = e.detail)} />
+        <ShipSelect bind:ships bind:selectedShip />
         <hr>
-        <OrientationBtn on:orientation={(e) => (orientation = e.detail)} />
+        <OrientationBtn bind:orientation />
         <hr>
-        <PlacementOption on:clear={() => clearShips() }></PlacementOption>
+        <PlacementOption on:clear={() => clearShips()} on:random={() =>
+            grid.placeRandom()}></PlacementOption>
     </div>
 </div>

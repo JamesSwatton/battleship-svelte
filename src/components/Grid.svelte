@@ -3,20 +3,16 @@
 
     export let state;
     export let ships;
-    export let selected;
+    export let selectedShip;
     export let orientation;
 
-    let currentPos = null;
-
-    let allPos = [];
-
-    $: {
-        if (selected) {
-            allPos = ships
-                .map((s) => (s.type !== selected.type ? s.pos : []))
+    $: allPos = () => {
+        if (selectedShip) {
+            return ships
+                .map((s) => (s.type !== selectedShip.type ? s.pos : []))
                 .flat();
         } else {
-            allPos = ships.map((s) => s.pos).flat();
+            return ships.map((s) => s.pos).flat();
         }
     }
 
@@ -30,23 +26,21 @@
         }
     }
 
-    function handleMouseEnter(id) {
-        currentPos = id;
-        updateShipPos();
-    }
-
     function handleClick(id) {
-        if (state === "placement" && selected) {
-            saveShipPos();
-        } else if (state === "placement" && !selected) {
+        if (state === "placement" && selectedShip) {
+            if (saveShipPos(selectedShip)) selectedShip = null;
+        } else if (state === "placement" && !selectedShip) {
+            // select already placed ship
             ships.forEach((s) => {
-                if (s.pos.includes(id)) selected = s;
+                if (s.pos.includes(id)) selectedShip = s;
             });
+            // clear ship positions to update select button state
+            ships[ships.findIndex(s => s.type === selectedShip.type)].pos = [];
         }
     }
 
-    function updateShipPos() {
-        if (selected && currentPos) {
+    function updateShipPos(currentPos, orientation) {
+        if (selectedShip) {
             let parsedCurrentPos = currentPos.split("").map((c) => parseInt(c));
             let x = parsedCurrentPos[0];
             let y = parsedCurrentPos[1];
@@ -54,29 +48,50 @@
             const constrain = (pos, size) =>
                 pos > 10 - size ? 10 - size : pos;
             if (orientation === "horizontal") {
-                x = constrain(parsedCurrentPos[0], selected.size);
-                for (let i = x; i < x + selected.size; i++) {
+                x = constrain(parsedCurrentPos[0], selectedShip.size);
+                for (let i = x; i < x + selectedShip.size; i++) {
                     pos.push(`${i}${y}`);
                 }
             } else {
-                y = constrain(parsedCurrentPos[1], selected.size);
-                for (let j = y; j < y + selected.size; j++) {
+                y = constrain(parsedCurrentPos[1], selectedShip.size);
+                for (let j = y; j < y + selectedShip.size; j++) {
                     pos.push(`${x}${j}`);
                 }
             }
-            selected = { ...selected, pos: pos };
+            selectedShip = { ...selectedShip, pos: pos };
         }
     }
 
     function saveShipPos() {
         const hasNoOverlap = () =>
-            selected.pos.every((e) => !allPos.includes(e));
+            selectedShip.pos.every((e) => !allPos().includes(e));
         if (hasNoOverlap()) {
-            let index = ships.findIndex((e) => e.type === selected.type);
-            ships[index] = selected;
-            selected = null;
+            let index = ships.findIndex((e) => e.type === selectedShip.type);
+            ships[index] = selectedShip;
+            return true;
         }
+        return false;
     }
+
+    export function placeRandom() {
+        const dirs = ["horizontal", "vertical"];
+        const randDir = () => dirs[Math.floor(Math.random() * 2)];
+        const randPos = () => {
+            let randX = Math.floor(Math.random() * 10);
+            let randY = Math.floor(Math.random() * 10);
+            return `${randX}${randY}`;
+        }
+
+        ships.forEach(ship => {
+            selectedShip = ship;
+            updateShipPos(randPos(), randDir())
+            while (!saveShipPos()) {
+                updateShipPos(randPos(), randDir())
+            }
+            selectedShip = null;
+        });
+    }
+
 
     onMount(() => createIDs());
 </script>
@@ -111,17 +126,17 @@
 <div
     id="grid-container"
     on:mouseleave={() => {
-        if (selected) selected.pos = [];
+        if (selectedShip) selectedShip.pos = [];
     }}>
     {#each ids as id}
         <div
             {id}
             class="grid-square"
-            on:mouseenter={() => handleMouseEnter(id)}
+            on:mouseenter={() => updateShipPos(id, orientation)}
             on:click={() => handleClick(id)}
-            class:ship={allPos.includes(id)}
-            class:selectedShip={selected && selected.pos.includes(id)}
-            class:overlap={allPos.includes(id) && selected && selected.pos.includes(id)}>
+            class:ship={allPos().includes(id)}
+            class:selectedShip={selectedShip && selectedShip.pos.includes(id)}
+            class:overlap={allPos().includes(id) && selectedShip && selectedShip.pos.includes(id)}>
             {id}
         </div>
     {/each}
