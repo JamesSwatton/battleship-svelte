@@ -6,6 +6,11 @@
     export let selectedShip;
     export let orientation;
 
+    let currentPos;
+
+    let ids = [];
+    onMount(() => createIDs());
+
     $: allPos = () => {
         if (selectedShip) {
             return ships
@@ -16,7 +21,7 @@
         }
     }
 
-    let ids = [];
+    $: if(orientation && selectedShip && currentPos) updateShipPos();
 
     function createIDs() {
         for (let y = 0; y < 10; y++) {
@@ -26,20 +31,28 @@
         }
     }
 
-    function handleClick(id) {
+    function handleMouseLeave() {
+        if (selectedShip) selectedShip.pos = [];
+        currentPos = null;
+    }
+
+    function handleClick() {
         if (state === "placement" && selectedShip) {
             if (saveShipPos(selectedShip)) selectedShip = null;
         } else if (state === "placement" && !selectedShip) {
             // select already placed ship
             ships.forEach((s) => {
-                if (s.pos.includes(id)) selectedShip = s;
+                if (s.pos.includes(currentPos)){
+                    let sel = {...s}
+                    // clear ship positions to update select button state
+                    ships[ships.findIndex(s => s.type === sel.type)].pos = [];
+                    selectedShip = sel;
+                }
             });
-            // clear ship positions to update select button state
-            ships[ships.findIndex(s => s.type === selectedShip.type)].pos = [];
         }
     }
 
-    function updateShipPos(currentPos, orientation) {
+    function updateShipPos() {
         if (selectedShip) {
             let parsedCurrentPos = currentPos.split("").map((c) => parseInt(c));
             let x = parsedCurrentPos[0];
@@ -92,8 +105,6 @@
         });
     }
 
-
-    onMount(() => createIDs());
 </script>
 
 <style>
@@ -125,19 +136,16 @@
 
 <div
     id="grid-container"
-    on:mouseleave={() => {
-        if (selectedShip) selectedShip.pos = [];
-    }}>
+    on:mouseleave={() => handleMouseLeave()}>
     {#each ids as id}
         <div
             {id}
             class="grid-square"
-            on:mouseenter={() => updateShipPos(id, orientation)}
+            on:mouseenter={() => currentPos = id}
             on:click={() => handleClick(id)}
             class:ship={allPos().includes(id)}
             class:selectedShip={selectedShip && selectedShip.pos.includes(id)}
             class:overlap={allPos().includes(id) && selectedShip && selectedShip.pos.includes(id)}>
-            {id}
         </div>
     {/each}
 </div>
