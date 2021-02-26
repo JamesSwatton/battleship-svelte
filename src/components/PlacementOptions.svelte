@@ -3,5 +3,16 @@
     const dispatch = createEventDispatcher();
 </script>
 
-<button on:click={() => dispatch("random")}>Random</button>
-<button on:click={() => dispatch("clear")}>Clear</button>
+<style>
+    div {
+        padding: 0;
+        margin: 0;
+        display: inline-block;
+        margin-left: 20px;
+        cursor: pointer;
+        font-size: 30px;
+    }
+</style>
+
+<div on:click={() => dispatch("random")}>&#9860;</div>
+<div on:click={() => dispatch("clear")}>&#11034;</div>

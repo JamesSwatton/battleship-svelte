@@ -2,6 +2,8 @@
     export let ships;
     export let selectedShip;
 
+    let hoverShip = null;
+
     function handleClick(ship) {
         selectedShip = ship;
         ships[ships.findIndex(s => s.type === ship.type)].pos = [];
@@ -10,19 +12,23 @@
 
 <style>
     ul {
-        list-style-type: none;
+        padding: 0;
+        list-style-position: inside;
+        list-style-type: circle;
     }
 
-    button {
+    li {
+        padding-left: 20px;
         cursor: pointer;
     }
 
     .selectedShip {
-        border-bottom: 2px solid black;
+        color: white;
+        background-color: #333;
     }
 
     .placed {
-        background-color: lightblue;
+        list-style-type: disc;
     }
 </style>
 
@@ -30,12 +36,14 @@
 <hr>
 <ul>
     {#each ships as ship}
-        <li>
-            <button
-                on:click={() => handleClick(ship)}
-                class:selectedShip={selectedShip && selectedShip.type === ship.type}
-                class:placed={ship.pos.length > 0}
-                value={ship.type}>{ship.type}</button>
+        <li
+            on:click={() => handleClick(ship)}
+            on:mouseenter={() => hoverShip = ship}
+            on:mouseleave={() => hoverShip = null}
+            class:selectedShip={selectedShip && selectedShip.type === ship.type}
+            class:placed={ship.pos.length > 0}>
+            {ship.type.charAt(0).toUpperCase() + ship.type.slice(1)} {hoverShip && hoverShip.type ===
+            ship.type ? " <--" : ""}
         </li>
     {/each}
 </ul>

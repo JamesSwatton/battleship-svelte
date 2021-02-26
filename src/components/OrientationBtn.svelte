@@ -5,11 +5,25 @@
         if (event && event.keyCode === 32) {
             orientation = orientation === "horizontal" ? "vertical" : "horizontal"
             return;
+        } else if (!event) {
+            orientation = orientation === "horizontal" ?
+                "vertical" : "horizontal";
         }
-        orientation = orientation === "horizontal" ? "vertical" : "horizontal"
     }
 </script>
 
+<style>
+    h2 {
+        cursor: pointer;
+        margin-left: 20px;
+    }
+</style>
+
 <svelte:window on:keydown={(e) => changeOrientation(e)} />
-<button on:click={() => changeOrientation()}>Change Orientation</button>
-<p>{orientation}</p>
+<h2 on:click={() => changeOrientation()}>
+    {#if orientation === "horizontal"}
+        &rightarrow;
+    {:else}
+        &downarrow;
+    {/if}
+    </h2>

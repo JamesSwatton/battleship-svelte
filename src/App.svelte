@@ -30,11 +30,14 @@
 
 <style>
     #game-container {
-        display: inline-flex;
+        width: 720px;
+        margin: auto;
     }
 
     #ship-placement {
+        width: 180px;
         display: inline-block;
+        margin-left: 40px;
     }
 </style>
 
@@ -43,9 +46,9 @@
     <div id="ship-placement">
         <ShipSelect bind:ships bind:selectedShip />
         <hr>
-        <OrientationBtn bind:orientation />
-        <hr>
         <PlacementOption on:clear={() => clearShips()} on:random={() =>
             grid.placeRandom()}></PlacementOption>
+        <hr>
+        <OrientationBtn bind:orientation />
     </div>
 </div>

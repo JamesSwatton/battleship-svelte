@@ -117,25 +117,32 @@
         width: 500px;
         height: 500px;
         display: grid;
+        float: left;
         grid-template-columns: repeat(10, 1fr);
         grid-template-rows: repeat(10, 1fr);
+        grid-gap: 2px;
+        box-shadow: 10px 10px 30px #333;
     }
 
     .grid-square {
-        border: 1px solid black;
+        background-color:deepskyblue;
     }
 
     .ship {
         cursor: pointer;
-        background-color: lightblue;
+        background-color: darkgray;
     }
 
     .selectedShip {
-        background-color: cyan;
+        border: none;
+        background-color: lightgray;
+        position: relative;
+        top: -8px;
+        left: -8px;
     }
 
     .overlap {
-        background-color: red;
+        background-color: tomato;
     }
 </style>
 
