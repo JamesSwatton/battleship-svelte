@@ -96,12 +96,17 @@
         }
 
         ships.forEach(ship => {
+            currentPos = randPos();
+            orientation = randDir();
             selectedShip = ship;
-            updateShipPos(randPos(), randDir())
+            updateShipPos()
             while (!saveShipPos()) {
-                updateShipPos(randPos(), randDir())
+                currentPos = randPos();
+                orientation = randDir();
+                updateShipPos()
             }
             selectedShip = null;
+            currentPos = null;
         });
     }
 
