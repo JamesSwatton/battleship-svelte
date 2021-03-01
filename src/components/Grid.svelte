@@ -1,10 +1,12 @@
 <script>
     import { onMount } from "svelte";
 
+    export let ref;
     export let state;
     export let ships;
     export let selectedShip;
     export let orientation;
+    export let hasOverlap;
 
     let currentPos;
 
@@ -79,10 +81,13 @@
         const hasNoOverlap = () =>
             selectedShip.pos.every((e) => !allPos().includes(e));
         if (hasNoOverlap()) {
+            hasOverlap = false;
             let index = ships.findIndex((e) => e.type === selectedShip.type);
             ships[index] = selectedShip;
+            console.log('hi')
             return true;
         }
+        hasOverlap = true;
         return false;
     }
 
@@ -113,11 +118,8 @@
 </script>
 
 <style>
-    #grid-container {
-        width: 500px;
-        height: 500px;
+    .grid-container {
         display: grid;
-        float: left;
         grid-template-columns: repeat(10, 1fr);
         grid-template-rows: repeat(10, 1fr);
         grid-gap: 2px;
@@ -147,7 +149,8 @@
 </style>
 
 <div
-    id="grid-container"
+    {ref}
+    class="grid-container"
     on:mouseleave={() => handleMouseLeave()}>
     {#each ids as id}
         <div
