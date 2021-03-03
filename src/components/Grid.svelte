@@ -84,7 +84,6 @@
             hasOverlap = false;
             let index = ships.findIndex((e) => e.type === selectedShip.type);
             ships[index] = selectedShip;
-            console.log('hi')
             return true;
         }
         hasOverlap = true;
