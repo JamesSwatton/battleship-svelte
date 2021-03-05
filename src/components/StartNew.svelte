@@ -42,15 +42,8 @@
         </div>
     {/if}
 {:else}
-    {#if newGame}
-        <div transition:fade {ref} class="alert-container active" on:click={() =>
-            dispatch("new")}>
-            <h3>Start Game</h3>
-        </div>
-    {:else}
-        <div transition:fade {ref} class="alert-container inactive" on:click={() =>
-            dispatch("new")}>
-            <h3>New Game</h3>
-        </div>
-    {/if}
+    <div transition:fade {ref} class="alert-container inactive" on:click={() =>
+        dispatch("new")}>
+        <h3>New Game</h3>
+    </div>
 {/if}

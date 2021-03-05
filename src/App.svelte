@@ -8,7 +8,6 @@
 
     let states = ["placement", "game"];
     let state = states[0];
-    let newGame = false;
 
     let activePlayer = 'player';
 
@@ -30,7 +29,17 @@
         { type: "destroyer",  size: 2, hits: [], pos: [] },
     ];
 
-    let opponentGuesses = [];
+    let opponentPossibleGuesses = [];
+    createGuesses();
+    function createGuesses() {
+        for (let y = 0; y < 10; y++) {
+            for (let x = 0; x < 10; x++) {
+                opponentPossibleGuesses = [...opponentPossibleGuesses, `${x}${y}`];
+            }
+        }
+    }
+
+    let opponentGuesses = {hits: [], misses: []};
 
     $: numOfShipsPlaced = playerShips.filter(s => s.pos.length > 1).length;
 
@@ -53,7 +62,6 @@
         if (canStartGame) {
             state = states[1]
             opponentGridEl.placeRandom();
-            console.log(opponentShips);
         } else {
             console.log("we can't start yet")
         }
@@ -69,13 +77,10 @@
     }
 
     function opponentTurn() {
-        const getRandPos = () => {
-            let randX = Math.floor(Math.random() * 10);
-            let randY = Math.floor(Math.random() * 10);
-            return `${randX}${randY}`;
-        }
-
-        let randPos = getRandPos();
+        let randIndex = Math.floor(Math.random() *
+            opponentPossibleGuesses.length);
+        let randPos = opponentPossibleGuesses.splice(randIndex, 1)[0];
+        console.log(randPos, opponentPossibleGuesses.length)
 
         let hit = false;
 
@@ -85,7 +90,8 @@
                 hit = true;
             }
         })
-        if (!hit) opponentGuesses = [...opponentGuesses, randPos];
+        if (!hit ) opponentGuesses = {...opponentGuesses,
+            misses:[...opponentGuesses.misses, randPos] };
         activePlayer = "player";
     }
 
@@ -144,7 +150,7 @@
     />
 
     <div id="ship-placement">
-        <ShipSelect bind:ships={playerShips} bind:selectedShip />
+        <ShipSelect bind:ships={playerShips} bind:selectedShip {state} />
         <hr>
         <PlacementOption on:clear={() => clearShips()} on:random={() =>
             playerGridEl.placeRandom()} {state}></PlacementOption>
@@ -161,5 +167,5 @@
     <Messages ref="messages" bind:this={messagesEl} {hasOverlap} {numOfShipsPlaced} {state}/>
 
     <StartNew ref="startNew" on:start={() => handleStart()}
-        {canStartGame} {state} {newGame}></StartNew>
+        {canStartGame} {state} ></StartNew>
 </div>

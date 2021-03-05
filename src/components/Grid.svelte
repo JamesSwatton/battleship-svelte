@@ -9,7 +9,7 @@
     export let orientation;
     export let hasOverlap;
     export let hideShips = false;
-    export let guesses = [];
+    export let guesses = {hits: [], misses: []};
     export let activePlayer;
 
     let currentPos;
@@ -60,14 +60,19 @@
         } else if (activePlayer == "player"){
             let hit = false;
             ships.forEach((s, i) => {
-                if (s.pos.includes(currentPos)) {
+                if (s.pos.includes(currentPos) &&
+                    !guesses.hits.includes(currentPos)) {
                     ships[i] = {...s, hits:[...s.hits, currentPos]};
                     hit = true;
+                    guesses = {...guesses, hits: [...guesses.hits, currentPos]};
+                    dispatch('activePlayer', 'opponent')
                 }
             })
-            if (!hit) guesses = [...guesses, currentPos];
-            console.log('bum')
-            dispatch('activePlayer', 'opponent')
+            if (!hit && !guesses.misses.includes(currentPos) &&
+                !guesses.hits.includes(currentPos)) {
+                guesses = {...guesses, misses: [...guesses.misses, currentPos]};
+                dispatch('activePlayer', 'opponent')
+            }
         }
     }
 
@@ -138,6 +143,11 @@
         cursor: default;
         padding: 0;
         margin: 0;
+        font-size: 14px;
+    }
+
+    .large {
+        font-size: 30px;
     }
 
     .grid-container {
@@ -179,6 +189,10 @@
     .overlap {
         background-color: tomato;
     }
+
+    .large {
+        font-size: 26px;
+    }
 </style>
 
 <div
@@ -195,7 +209,7 @@
             class:selectedShip={selectedShip && selectedShip.pos.includes(id)}
             class:disable={ref == "grid-2"}
             class:overlap={allHits().includes(id) || allPos().includes(id) && selectedShip && selectedShip.pos.includes(id)}>
-            <p>{@html guesses.includes(id) ? "&#10005;" : ""}</p>
+            <p class:large={ref == "grid-1"}>{@html guesses.misses.includes(id) ? "&#10005;" : ""}</p>
         </div>
     {/each}
 </div>
