@@ -4,15 +4,17 @@
     import PlacementOption from "./components/PlacementOptions.svelte";
     import OrientationBtn from "./components/OrientationBtn.svelte";
     import Messages from "./components/Messages.svelte";
-    import Alert from "./components/Alert.svelte";
+    import StartNew from "./components/StartNew.svelte";
 
     let states = ["placement", "game"];
-    let startGame = false;
     let state = states[0];
+    let newGame = false;
+
+    let activePlayer = 'player';
 
 
     // prettier-ignore
-    let ships = [
+    let playerShips = [
         { type: "carrier",    size: 5, hits: [], pos: [] },
         { type: "battleship", size: 4, hits: [], pos: [] },
         { type: "cruiser",    size: 3, hits: [], pos: [] },
@@ -20,22 +22,74 @@
         { type: "destroyer",  size: 2, hits: [], pos: [] },
     ];
 
-    $: numOfShipsPlaced = ships.filter(s => s.pos.length > 1).length;
+    let opponentShips = [
+        { type: "carrier",    size: 5, hits: [], pos: [] },
+        { type: "battleship", size: 4, hits: [], pos: [] },
+        { type: "cruiser",    size: 3, hits: [], pos: [] },
+        { type: "submarine",  size: 3, hits: [], pos: [] },
+        { type: "destroyer",  size: 2, hits: [], pos: [] },
+    ];
+
+    let opponentGuesses = [];
+
+    $: numOfShipsPlaced = playerShips.filter(s => s.pos.length > 1).length;
 
     let selectedShip = null;
     let orientation = "horizontal";
     let hasOverlap = false;
-    let gridEl;
+    let playerGridEl;
+    let opponentGridEl;
     let messagesEl;
 
     function clearShips() {
-        ships = ships.map(s => {
+        playerShips = playerShips.map(s => {
             return {...s, pos: []}
         })
     }
 
-    $: canStartGame = numOfShipsPlaced == 5 ? true : false;
+    $: canStartGame = numOfShipsPlaced == 5 && state == "placement" ? true : false;
 
+    function handleStart() {
+        if (canStartGame) {
+            state = states[1]
+            opponentGridEl.placeRandom();
+            console.log(opponentShips);
+        } else {
+            console.log("we can't start yet")
+        }
+        messagesEl.startGameMsg(canStartGame);
+    }
+
+    $: winner = () => {
+        if (playerShips.map(s => s.hits).flat().length == 17) {
+            return 'opponent'
+        } else if (opponentShips.map(s => s.hits).flat().length == 17) {
+            return 'player'
+        }
+    }
+
+    function opponentTurn() {
+        const getRandPos = () => {
+            let randX = Math.floor(Math.random() * 10);
+            let randY = Math.floor(Math.random() * 10);
+            return `${randX}${randY}`;
+        }
+
+        let randPos = getRandPos();
+
+        let hit = false;
+
+        playerShips.forEach((s, i) => {
+            if (s.pos.includes(randPos)) {
+                playerShips[i] = {...s, hits:[...s.hits, randPos]};
+                hit = true;
+            }
+        })
+        if (!hit) opponentGuesses = [...opponentGuesses, randPos];
+        activePlayer = "player";
+    }
+
+    $: if (activePlayer == 'opponent') setTimeout(() => opponentTurn(), 1000)
 </script>
 
 <style>
@@ -74,31 +128,38 @@
         grid-area: c;
     }
 
-    :global([ref=alert]) {
+    :global([ref=startNew]) {
         grid-area: e;
     }
-
-
 </style>
 
 <div id="game-container">
-    <Grid ref="grid-1" bind:this={gridEl} bind:selectedShip {orientation}
-        bind:hasOverlap bind:ships {state} />
+    <Grid
+        ref={state == "placement" ? 'grid-1' : 'grid-2'}
+        bind:this={playerGridEl}
+        bind:selectedShip {orientation}
+        bind:hasOverlap bind:ships={playerShips}
+        guesses={opponentGuesses}
+        {state}
+    />
 
     <div id="ship-placement">
-        <ShipSelect bind:ships bind:selectedShip />
+        <ShipSelect bind:ships={playerShips} bind:selectedShip />
         <hr>
         <PlacementOption on:clear={() => clearShips()} on:random={() =>
-            gridEl.placeRandom()}></PlacementOption>
+            playerGridEl.placeRandom()} {state}></PlacementOption>
         <hr>
         <OrientationBtn bind:orientation />
     </div>
 
-    <Grid ref="grid-2" bind:this={gridEl} bind:selectedShip {orientation}
-        bind:ships {state} />
+    <Grid ref={state == "placement" ? 'grid-2' : 'grid-1'}
+        bind:this={opponentGridEl} bind:ships={opponentShips} {state}
+        hideShips={true} on:activePlayer={(e) => activePlayer = e.detail}
+        {activePlayer}
+    />
 
-    <Messages ref="messages" bind:this={messagesEl} {hasOverlap} {numOfShipsPlaced} />
+    <Messages ref="messages" bind:this={messagesEl} {hasOverlap} {numOfShipsPlaced} {state}/>
 
-    <Alert ref="alert" on:start={() => messagesEl.startGameMsg(canStartGame)}
-        {canStartGame}></Alert>
+    <StartNew ref="startNew" on:start={() => handleStart()}
+        {canStartGame} {state} {newGame}></StartNew>
 </div>

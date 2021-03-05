@@ -1,5 +1,6 @@
 <script>
-    import { onMount } from "svelte";
+    import { onMount, createEventDispatcher } from "svelte";
+    const dispatch = createEventDispatcher();
 
     export let ref;
     export let state;
@@ -7,6 +8,9 @@
     export let selectedShip;
     export let orientation;
     export let hasOverlap;
+    export let hideShips = false;
+    export let guesses = [];
+    export let activePlayer;
 
     let currentPos;
 
@@ -22,6 +26,8 @@
             return ships.map((s) => s.pos).flat();
         }
     }
+
+    $: allHits = () => ships.map(s => s.hits).flat();
 
     $: if(orientation && selectedShip && currentPos) updateShipPos();
 
@@ -51,6 +57,17 @@
                     selectedShip = sel;
                 }
             });
+        } else if (activePlayer == "player"){
+            let hit = false;
+            ships.forEach((s, i) => {
+                if (s.pos.includes(currentPos)) {
+                    ships[i] = {...s, hits:[...s.hits, currentPos]};
+                    hit = true;
+                }
+            })
+            if (!hit) guesses = [...guesses, currentPos];
+            console.log('bum')
+            dispatch('activePlayer', 'opponent')
         }
     }
 
@@ -117,6 +134,12 @@
 </script>
 
 <style>
+    p {
+        cursor: default;
+        padding: 0;
+        margin: 0;
+    }
+
     .grid-container {
         display: grid;
         grid-template-columns: repeat(10, 1fr);
@@ -125,8 +148,19 @@
         box-shadow: 10px 10px 30px #333;
     }
 
+    .disable {
+        pointer-events: none;
+    }
+
     .grid-square {
+        display: flex;
+        justify-content: center;
+        align-items: center;
         background-color:deepskyblue;
+    }
+
+    .grid-square:hover {
+        border: 3px solid white;
     }
 
     .ship {
@@ -157,9 +191,11 @@
             class="grid-square"
             on:mouseenter={() => currentPos = id}
             on:click={() => handleClick(id)}
-            class:ship={allPos().includes(id)}
+            class:ship={hideShips ? allHits().includes(id) : allPos().includes(id)}
             class:selectedShip={selectedShip && selectedShip.pos.includes(id)}
-            class:overlap={allPos().includes(id) && selectedShip && selectedShip.pos.includes(id)}>
+            class:disable={ref == "grid-2"}
+            class:overlap={allHits().includes(id) || allPos().includes(id) && selectedShip && selectedShip.pos.includes(id)}>
+            <p>{@html guesses.includes(id) ? "&#10005;" : ""}</p>
         </div>
     {/each}
 </div>

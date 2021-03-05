@@ -1,6 +1,12 @@
 <script>
     import { createEventDispatcher } from "svelte";
     const dispatch = createEventDispatcher();
+
+    export let state;
+
+    function handleClick(type) {
+        if (state == "placement") dispatch(type)
+    }
 </script>
 
 <style>
@@ -14,5 +20,5 @@
     }
 </style>
 
-<div on:click={() => dispatch("random")}>&#9860;</div>
-<div on:click={() => dispatch("clear")}>&#11034;</div>
+<div on:click={() => handleClick('random')}>&#9860;</div>
+<div on:click={() => handleClick("clear")}>&#11034;</div>
