@@ -10,7 +10,8 @@
     let newGame = false;
 
     function handleNewGame() {
-        newGame = true;
+        dispatch('newGame');
+        newGame = false;
     }
 </script>
 
@@ -74,13 +75,12 @@
         <div transition:fade {ref} class="alert-container active">
             <h3>Are you sure?</h3>
             <div id="yes-no-container">
-                <p class="yes-no" on:click={() => dispatch("newGame")}>YES</p>
+                <p class="yes-no" on:click={() => handleNewGame()}>YES</p>
                 <p class="yes-no" on:click={() => newGame = false}>NO</p>
             </div>
         </div>
     {:else}
-        <div transition:fade {ref} class="alert-container inactive" on:click={() =>
-            handleNewGame()}>
+        <div transition:fade {ref} class="alert-container inactive" on:click={() => newGame = true}>
             <h3>New Game</h3>
         </div>
     {/if}

@@ -9,7 +9,7 @@
     export let orientation;
     export let hasOverlap;
     export let hideShips = false;
-    export let guesses = {hits: [], misses: []};
+    export let guesses;
     export let activePlayer;
 
     let currentPos;
@@ -65,13 +65,13 @@
                     ships[i] = {...s, hits:[...s.hits, currentPos]};
                     hit = true;
                     guesses = {...guesses, hits: [...guesses.hits, currentPos]};
-                    dispatch('activePlayer', 'opponent')
+                    dispatch('turn', {guesses: guesses, activePlayer: 'opponent'})
                 }
             })
             if (!hit && !guesses.misses.includes(currentPos) &&
                 !guesses.hits.includes(currentPos)) {
                 guesses = {...guesses, misses: [...guesses.misses, currentPos]};
-                dispatch('activePlayer', 'opponent')
+                dispatch('turn', {guesses: guesses, activePlayer: 'opponent'})
             }
         }
     }

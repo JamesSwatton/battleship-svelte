@@ -69,6 +69,7 @@
             { type: "submarine",  size: 3, hits: [], pos: [] },
             { type: "destroyer",  size: 2, hits: [], pos: [] },
         ];
+        playerGuesses = {hits: [], misses: []}
         opponentGuesses = {hits: [], misses: []}
     }
 
@@ -118,6 +119,11 @@
     }
 
     $: if (activePlayer == 'opponent') setTimeout(() => opponentTurn(), 1000)
+
+    function handleTurn(e) {
+        playerGuesses = e.guesses;
+        activePlayer = e.activePlayer;
+    }
 </script>
 
 <style>
@@ -186,7 +192,8 @@
 
     <Grid ref={state == "placement" ? 'grid-2' : 'grid-1'}
         bind:this={opponentGridEl} bind:ships={opponentShips} {state}
-        hideShips={true} on:activePlayer={(e) => activePlayer = e.detail}
+        hideShips={true} on:turn={(e) => handleTurn(e.detail)}
+        guesses={playerGuesses}
         {activePlayer}
     />
 
