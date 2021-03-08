@@ -1,7 +1,6 @@
 <script>
     export let ships;
     export let selectedShip;
-    export let state;
 
     let hoverShip = null;
 
@@ -12,10 +11,6 @@
 </script>
 
 <style>
-    .disable {
-        pointer-events: none;
-    }
-
     ul {
         padding: 0;
         list-style-position: inside;
@@ -35,9 +30,13 @@
     .placed {
         list-style-type: disc;
     }
+
+    .sunk {
+        text-decoration: line-through;
+    }
 </style>
 
-<div id="select-container" class:disable={state == "game"}>
+<div id="select-container">
     <h3>Select Ship</h3>
     <hr>
     <ul>
@@ -47,8 +46,10 @@
                 on:mouseenter={() => hoverShip = ship}
                 on:mouseleave={() => hoverShip = null}
                 class:selectedShip={selectedShip && selectedShip.type === ship.type}
-                class:placed={ship.pos.length > 0}>
-                {ship.type.charAt(0).toUpperCase() + ship.type.slice(1)} {hoverShip && hoverShip.type ===
+                class:placed={ship.pos.length > 0}
+                class:sunk={ship.hits.length == ship.size}>
+                {ship.type.charAt(0).toUpperCase() + ship.type.slice(1)}
+                ({ship.size}) {hoverShip && hoverShip.type ===
                 ship.type ? " <--" : ""}
             </li>
         {/each}

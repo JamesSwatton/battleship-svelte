@@ -1,19 +1,37 @@
 <script>
-    import { createEventDispatcher } from 'svelte';
     import { fade } from 'svelte/transition';
-
+    import { createEventDispatcher } from 'svelte';
     const dispatch = createEventDispatcher();
 
     export let ref;
     export let state;
     export let canStartGame;
-    export let newGame;
+
+    let newGame = false;
+
+    function handleNewGame() {
+        newGame = true;
+    }
 </script>
 
 <style>
+    h3, p {
+        padding: 0;
+        margin: 0;
+    }
+
     .alert-container {
-        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
         cursor: pointer;
+    }
+
+    #yes-no-container {
+        width: 50%;
+        display: flex;
+        justify-content: space-around;
     }
 
     .inactive {
@@ -26,6 +44,16 @@
     .active {
         border: 2px solid #333;
         box-shadow: 10px 10px 30px #333;
+    }
+
+    .yes-no {
+        text-align: center;
+        width: 50%;
+    }
+
+    .yes-no:hover {
+        background-color: #333;
+        color: white;
     }
 </style>
 
@@ -42,8 +70,18 @@
         </div>
     {/if}
 {:else}
-    <div transition:fade {ref} class="alert-container inactive" on:click={() =>
-        dispatch("new")}>
-        <h3>New Game</h3>
-    </div>
+    {#if newGame}
+        <div transition:fade {ref} class="alert-container active">
+            <h3>Are you sure?</h3>
+            <div id="yes-no-container">
+                <p class="yes-no" on:click={() => dispatch("newGame")}>YES</p>
+                <p class="yes-no" on:click={() => newGame = false}>NO</p>
+            </div>
+        </div>
+    {:else}
+        <div transition:fade {ref} class="alert-container inactive" on:click={() =>
+            handleNewGame()}>
+            <h3>New Game</h3>
+        </div>
+    {/if}
 {/if}

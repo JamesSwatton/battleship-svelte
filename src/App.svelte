@@ -11,7 +11,6 @@
 
     let activePlayer = 'player';
 
-
     // prettier-ignore
     let playerShips = [
         { type: "carrier",    size: 5, hits: [], pos: [] },
@@ -29,8 +28,14 @@
         { type: "destroyer",  size: 2, hits: [], pos: [] },
     ];
 
+    let playerGuesses = {hits: [], misses: []};
+
+    let opponentGuesses = {hits: [], misses: []};
+
     let opponentPossibleGuesses = [];
+
     createGuesses();
+
     function createGuesses() {
         for (let y = 0; y < 10; y++) {
             for (let x = 0; x < 10; x++) {
@@ -38,8 +43,6 @@
             }
         }
     }
-
-    let opponentGuesses = {hits: [], misses: []};
 
     $: numOfShipsPlaced = playerShips.filter(s => s.pos.length > 1).length;
 
@@ -49,6 +52,25 @@
     let playerGridEl;
     let opponentGridEl;
     let messagesEl;
+
+    function reset() {
+        state = states[0]
+        playerShips = [
+            { type: "carrier",    size: 5, hits: [], pos: [] },
+            { type: "battleship", size: 4, hits: [], pos: [] },
+            { type: "cruiser",    size: 3, hits: [], pos: [] },
+            { type: "submarine",  size: 3, hits: [], pos: [] },
+            { type: "destroyer",  size: 2, hits: [], pos: [] },
+        ];
+        opponentShips = [
+            { type: "carrier",    size: 5, hits: [], pos: [] },
+            { type: "battleship", size: 4, hits: [], pos: [] },
+            { type: "cruiser",    size: 3, hits: [], pos: [] },
+            { type: "submarine",  size: 3, hits: [], pos: [] },
+            { type: "destroyer",  size: 2, hits: [], pos: [] },
+        ];
+        opponentGuesses = {hits: [], misses: []}
+    }
 
     function clearShips() {
         playerShips = playerShips.map(s => {
@@ -137,6 +159,10 @@
     :global([ref=startNew]) {
         grid-area: e;
     }
+
+    .disable {
+        pointer-events: none;
+    }
 </style>
 
 <div id="game-container">
@@ -149,8 +175,8 @@
         {state}
     />
 
-    <div id="ship-placement">
-        <ShipSelect bind:ships={playerShips} bind:selectedShip {state} />
+    <div id="ship-placement" class:disable={state == 'game'}>
+        <ShipSelect bind:ships={playerShips} bind:selectedShip />
         <hr>
         <PlacementOption on:clear={() => clearShips()} on:random={() =>
             playerGridEl.placeRandom()} {state}></PlacementOption>
@@ -166,6 +192,6 @@
 
     <Messages ref="messages" bind:this={messagesEl} {hasOverlap} {numOfShipsPlaced} {state}/>
 
-    <StartNew ref="startNew" on:start={() => handleStart()}
-        {canStartGame} {state} ></StartNew>
+    <StartNew ref="startNew" on:start={() => handleStart()} on:newGame={() =>
+        reset()} {canStartGame} {state} ></StartNew>
 </div>

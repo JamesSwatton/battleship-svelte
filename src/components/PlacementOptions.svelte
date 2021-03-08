@@ -18,7 +18,10 @@
         cursor: pointer;
         font-size: 30px;
     }
+
 </style>
 
-<div on:click={() => handleClick('random')}>&#9860;</div>
-<div on:click={() => handleClick("clear")}>&#11034;</div>
+<div id="options-container">
+    <div on:click={() => handleClick('random')}>&#9860;</div>
+    <div on:click={() => handleClick("clear")}>&#11034;</div>
+</div>
