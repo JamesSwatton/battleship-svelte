@@ -5,6 +5,7 @@
     import OrientationBtn from "./components/OrientationBtn.svelte";
     import Messages from "./components/Messages.svelte";
     import StartNew from "./components/StartNew.svelte";
+    import WonLost from "./components/WonLost.svelte";
 
     let states = ["placement", "game"];
     let state = states[0];
@@ -99,6 +100,8 @@
         }
     }
 
+    $: console.log('winner:', winner())
+
     function opponentTurn() {
         let randIndex = Math.floor(Math.random() *
             opponentPossibleGuesses.length);
@@ -192,7 +195,6 @@
         <h1>P</h1>
     </div>
 <div id="game-container">
-
     <Grid
         ref={state == "placement" ? 'grid-1' : 'grid-2'}
         bind:this={playerGridEl}
@@ -222,4 +224,8 @@
 
     <StartNew ref="startNew" on:start={() => handleStart()} on:newGame={() =>
         reset()} {canStartGame} {state} ></StartNew>
+
+    {#if winner()}
+        <WonLost ref="grid-1" {winner}></WonLost>
+    {/if}
 </div>
