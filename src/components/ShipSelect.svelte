@@ -37,7 +37,7 @@
 </style>
 
 <div id="select-container">
-    <h3>Select Ship</h3>
+    <h3 style="margin-left: 20px">Select Ship</h3>
     <hr>
     <ul>
         {#each ships as ship}

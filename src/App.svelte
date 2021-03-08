@@ -127,6 +127,14 @@
 </script>
 
 <style>
+    #title {
+        width: 720px;
+        display: flex;
+        justify-content: space-between;
+        margin: auto;
+        margin-bottom: 20px;
+    }
+
     #game-container {
         width: 720px;
         height: 640px;
@@ -171,7 +179,20 @@
     }
 </style>
 
+    <div id="title">
+        <h1>B</h1>
+        <h1>A</h1>
+        <h1>T</h1>
+        <h1>T</h1>
+        <h1>L</h1>
+        <h1>E</h1>
+        <h1>S</h1>
+        <h1>H</h1>
+        <h1>I</h1>
+        <h1>P</h1>
+    </div>
 <div id="game-container">
+
     <Grid
         ref={state == "placement" ? 'grid-1' : 'grid-2'}
         bind:this={playerGridEl}
