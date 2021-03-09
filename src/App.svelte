@@ -86,8 +86,6 @@
         if (canStartGame) {
             state = states[1]
             opponentGridEl.placeRandom();
-        } else {
-            console.log("we can't start yet")
         }
         messagesEl.startGameMsg(canStartGame);
     }
@@ -100,13 +98,10 @@
         }
     }
 
-    $: console.log('winner:', winner())
-
     function opponentTurn() {
         let randIndex = Math.floor(Math.random() *
             opponentPossibleGuesses.length);
         let randPos = opponentPossibleGuesses.splice(randIndex, 1)[0];
-        console.log(randPos, opponentPossibleGuesses.length)
 
         let hit = false;
 
