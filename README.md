@@ -11,4 +11,4 @@ similar problems (i.e. Vue).
 I ended up liking it's streamlined approach to reactivity and am curious enough
 to use it more now having had some experience with it.
 
-Anyway, play the game. Hopefully it works just how you remember it!
+Anyway, you can play the game [here](https://jamesswatton.github.io/battleship-svelte/index.html). Hopefully it works just how you remember it!
